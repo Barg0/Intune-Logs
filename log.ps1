@@ -18,7 +18,7 @@ $log = $true                     # Set to $false to disable logging in shell
 $enableLogFile = $true           # Set to $false to disable file output
 
 # Define the log output location
-$logFileDirectory = "$env:ProgramData\IntuneLogs\Applications\$scriptName"
+$logFileDirectory = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$scriptName"
 $logFile = "$logFileDirectory\uninstall.log"
 
 # Ensure the log directory exists
@@ -77,7 +77,7 @@ function Complete-Script {
     $duration = $scriptEndTime - $scriptStartTime
     Write-Log "Script execution time: $($duration.ToString("hh\:mm\:ss\.ff"))" -Tag "Info"
     Write-Log "Exit Code: $ExitCode" -Tag "Info"
-    Write-Log "======== Platform Script Completed ========" -Tag "End"
+    Write-Log "======== Script Completed ========" -Tag "End"
     exit $ExitCode
 }
 # Complete-Script -ExitCode 0
