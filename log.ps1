@@ -1,4 +1,4 @@
-# Script version:   2025-05-16 09:40
+# Script version:   2025-05-29 11:10
 # Script author:    Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
@@ -10,6 +10,7 @@ $scriptStartTime = Get-Date
 
 # Script name used for folder/log naming
 $scriptName = "NAME"
+$logFileName = "example.log"
 
 # ---------------------------[ Logging Setup ]---------------------------
 
@@ -19,7 +20,7 @@ $enableLogFile = $true           # Set to $false to disable file output
 
 # Define the log output location
 $logFileDirectory = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$scriptName"
-$logFile = "$logFileDirectory\uninstall.log"
+$logFile = "$logFileDirectory\$logFileName"
 
 # Ensure the log directory exists
 if ($enableLogFile -and -not (Test-Path $logFileDirectory)) {
