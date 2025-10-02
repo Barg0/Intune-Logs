@@ -1,4 +1,4 @@
-# Script version:   2025-05-29 11:10
+# Script version:   2025-10-02 12:00
 # Script author:    Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
@@ -92,4 +92,5 @@ function Complete-Script {
 
 Write-Log "======== Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
+
 
