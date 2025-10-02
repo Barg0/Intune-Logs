@@ -17,6 +17,7 @@ $logFileName = "example.log"
 # Logging control switches
 $log = $true                     # Set to $false to disable logging in shell
 $enableLogFile = $true           # Set to $false to disable file output
+$logDebug = $false               # Set to $true to allow debug logs
 
 # Define the log output location
 $logFileDirectory = "$env:ProgramData\IntuneLogs\Scripts\$scriptName"
@@ -29,9 +30,13 @@ if ($enableLogFile -and -not (Test-Path $logFileDirectory)) {
 
 # Function to write structured logs to file and console
 function Write-Log {
+    [CmdletBinding()]
     param ([string]$Message, [string]$Tag = "Info")
 
-    if (-not $log) { return } # Exit if logging is disabled
+    if (-not $log) { return } # Exit if all logging disabled
+
+    # Handle debug suppression
+    if ($Tag -eq "Debug" -and -not $logDebug) { return }
 
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $tagList = @("Start", "Check", "Info", "Success", "Error", "Debug", "End")
@@ -50,7 +55,7 @@ function Write-Log {
         "Info"    { "Yellow" }
         "Success" { "Green" }
         "Error"   { "Red" }
-        "Debug"   { "DarkYellow"}
+        "Debug"   { "DarkYellow" }
         "End"     { "Cyan" }
         default   { "White" }
     }
@@ -87,3 +92,4 @@ function Complete-Script {
 
 Write-Log "======== Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
+
