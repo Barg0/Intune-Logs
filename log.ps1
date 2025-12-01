@@ -1,57 +1,58 @@
-# Script version:   2025-10-02 12:00
-# Script author:    Barg0
-
 # ---------------------------[ Script Start Timestamp ]---------------------------
-
-# Capture start time to log script duration
 $scriptStartTime = Get-Date
 
-# ---------------------------[ Script name ]---------------------------
 
-# Script name used for folder/log naming
-$scriptName = "NAME"
+# ---------------------------[ Script Name ]---------------------------
+$scriptName  = "__NAME__"
 $logFileName = "example.log"
 
+
 # ---------------------------[ Logging Setup ]---------------------------
+# Logging configuration
+$log           = $true
+$logDebug      = $false   # Set to $true for verbose DEBUG logging
+$logGet        = $true    # enable/disable all [Get] logs
+$logRun        = $true    # enable/disable all [Run] logs
+$enableLogFile = $true
 
-# Logging control switches
-$log = $true                     # Set to $false to disable logging in shell
-$enableLogFile = $true           # Set to $false to disable file output
-$logDebug = $false               # Set to $true to allow debug logs
-
-# Define the log output location
 $logFileDirectory = "$env:ProgramData\IntuneLogs\Scripts\$scriptName"
-$logFile = "$logFileDirectory\$logFileName"
+$logFile          = "$logFileDirectory\$logFileName"
 
-# Ensure the log directory exists
-if ($enableLogFile -and -not (Test-Path $logFileDirectory)) {
+if ($enableLogFile -and -not (Test-Path -Path $logFileDirectory)) {
     New-Item -ItemType Directory -Path $logFileDirectory -Force | Out-Null
 }
 
-# Function to write structured logs to file and console
+
+# ---------------------------[ Logging Function ]---------------------------
 function Write-Log {
     [CmdletBinding()]
-    param ([string]$Message, [string]$Tag = "Info")
+    param (
+        [string]$Message,
+        [string]$Tag = "Info"
+    )
 
-    if (-not $log) { return } # Exit if all logging disabled
+    if (-not $log) { return }
 
-    # Handle debug suppression
-    if ($Tag -eq "Debug" -and -not $logDebug) { return }
+    # Per-tag switches
+    if (($Tag -eq "Debug") -and (-not $logDebug)) { return }
+    if (($Tag -eq "Get")   -and (-not $logGet))   { return }
+    if (($Tag -eq "Run")   -and (-not $logRun))   { return }
 
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $tagList = @("Start", "Check", "Info", "Success", "Error", "Debug", "End")
-    $rawTag = $Tag.Trim()
+    $tagList   = @("Start","Get","Run","Info","Success","Error","Debug","End")
+    $rawTag    = $Tag.Trim()
 
     if ($tagList -contains $rawTag) {
         $rawTag = $rawTag.PadRight(7)
-    } else {
-        $rawTag = "Error  "  # Fallback if an unrecognized tag is used
+    }
+    else {
+        $rawTag = "Error  "
     }
 
-    # Set tag colors
     $color = switch ($rawTag.Trim()) {
         "Start"   { "Cyan" }
-        "Check"   { "Blue" }
+        "Get"     { "Blue" }
+        "Run"     { "Magenta" }
         "Info"    { "Yellow" }
         "Success" { "Green" }
         "Error"   { "Red" }
@@ -62,12 +63,10 @@ function Write-Log {
 
     $logMessage = "$timestamp [  $rawTag ] $Message"
 
-    # Write to file if enabled
     if ($enableLogFile) {
-        "$logMessage" | Out-File -FilePath $logFile -Append
+        Add-Content -Path $logFile -Value $logMessage -Encoding UTF8
     }
 
-    # Write to console with color formatting
     Write-Host "$timestamp " -NoNewline
     Write-Host "[  " -NoNewline -ForegroundColor White
     Write-Host "$rawTag" -NoNewline -ForegroundColor $color
@@ -75,22 +74,22 @@ function Write-Log {
     Write-Host "$Message"
 }
 
-# ---------------------------[ Exit Function ]---------------------------
 
+# ---------------------------[ Exit Function ]---------------------------
 function Complete-Script {
     param([int]$ExitCode)
+
     $scriptEndTime = Get-Date
-    $duration = $scriptEndTime - $scriptStartTime
-    Write-Log "Script execution time: $($duration.ToString("hh\:mm\:ss\.ff"))" -Tag "Info"
+    $duration      = $scriptEndTime - $scriptStartTime
+
+    Write-Log "Script execution time: $($duration.ToString('hh\:mm\:ss\.ff'))" -Tag "Info"
     Write-Log "Exit Code: $ExitCode" -Tag "Info"
     Write-Log "======== Script Completed ========" -Tag "End"
+
     exit $ExitCode
 }
-# Complete-Script -ExitCode 0
+
 
 # ---------------------------[ Script Start ]---------------------------
-
 Write-Log "======== Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
-
-
